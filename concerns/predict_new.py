@@ -58,7 +58,7 @@ def generate_annotation_object(tweetids,text,annot_type,annots):
 
 def terror_annotate(ids,test_dataset):
     global return_list
-    terr_model_path = "/project/lerman_316/ashwin/new_models/concerns_terrorism_counterterrorism/checkpoint-400/"
+    terr_model_path = "new_models/concerns_terrorism_counterterrorism/checkpoint-400/"
     terr_model = AutoModelForSequenceClassification.from_pretrained(terr_model_path, num_labels=2).to(device)
     test_trainer = Trainer(terr_model)
     test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False)
@@ -72,7 +72,7 @@ def terror_annotate(ids,test_dataset):
 
 def econ_annotate(ids,test_dataset):
     global return_list
-    eco_model_path = "/project/lerman_316/ashwin/new_models/concerns_economy/checkpoint-400/"
+    eco_model_path = "new_models/concerns_economy/checkpoint-400/"
     eco_model = AutoModelForSequenceClassification.from_pretrained(eco_model_path, num_labels=2).to(device)
     test_trainer = Trainer(eco_model)
     test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False)
@@ -86,7 +86,7 @@ def econ_annotate(ids,test_dataset):
 
 def rel_annotate(ids,test_dataset):
     global return_list
-    rel_model_path = "/project/lerman_316/ashwin/new_models/concerns_religion/checkpoint-400/"
+    rel_model_path = "new_models/concerns_religion/checkpoint-400/"
     rel_model = AutoModelForSequenceClassification.from_pretrained(rel_model_path, num_labels=2).to(device)
     test_trainer = Trainer(rel_model)
     test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False)
@@ -99,7 +99,7 @@ def rel_annotate(ids,test_dataset):
 
 def immi_annotate(ids,test_dataset):
     global return_list
-    immi_model_path = "/project/lerman_316/ashwin/new_models/concerns_immigration_refugees/checkpoint-400/"
+    immi_model_path = "new_models/concerns_immigration_refugees/checkpoint-400/"
     immi_model = AutoModelForSequenceClassification.from_pretrained(immi_model_path, num_labels=2).to(device)
     test_trainer = Trainer(immi_model)
     test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False)
@@ -112,7 +112,7 @@ def immi_annotate(ids,test_dataset):
 
 def russ_annotate(ids,test_dataset):
     global return_list
-    russ_model_path = "/project/lerman_316/ashwin/new_models/concerns_relationship_w__russia/checkpoint-400/"
+    russ_model_path = "new_models/concerns_relationship_w__russia/checkpoint-400/"
     russ_model = AutoModelForSequenceClassification.from_pretrained(russ_model_path, num_labels=2).to(device)
     test_trainer = Trainer(russ_model)
     test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False)
@@ -125,7 +125,7 @@ def russ_annotate(ids,test_dataset):
 
 def cli_annotate(ids,test_dataset):
     global return_list
-    cli_model_path = "/project/lerman_316/ashwin/new_models/concerns_environment/checkpoint-200/"
+    cli_model_path = "new_models/concerns_environment/checkpoint-200/"
     cli_model = AutoModelForSequenceClassification.from_pretrained(cli_model_path, num_labels=2).to(device)
     test_trainer = Trainer(cli_model)
     test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False)
@@ -139,7 +139,7 @@ def cli_annotate(ids,test_dataset):
 
 def natl_annotate(ids,test_dataset):
     global return_list
-    natl_model_path = "/project/lerman_316/ashwin/new_models/concerns_national_identity_&_pride/checkpoint-400/"
+    natl_model_path = "new_models/concerns_national_identity_&_pride/checkpoint-400/"
     natl_model = AutoModelForSequenceClassification.from_pretrained(natl_model_path, num_labels=2).to(device)
     test_trainer = Trainer(natl_model)
     test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False)
@@ -152,7 +152,7 @@ def natl_annotate(ids,test_dataset):
 
 def intl_annotate(ids,test_dataset):
     global return_list
-    intl_model_path = "/project/lerman_316/ashwin/new_models/concerns_international_alliances/checkpoint-350/"
+    intl_model_path = "new_models/concerns_international_alliances/checkpoint-350/"
     intl_model = AutoModelForSequenceClassification.from_pretrained(intl_model_path, num_labels=2).to(device)
     test_trainer = Trainer(intl_model)
     test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False)
@@ -166,7 +166,7 @@ def intl_annotate(ids,test_dataset):
 
 def fake_annotate(ids,test_dataset):
     global return_list
-    fake_model_path = "/project/lerman_316/ashwin/new_models/concerns_fake_news_misinfo/checkpoint-200/"
+    fake_model_path = "new_models/concerns_fake_news_misinfo/checkpoint-200/"
     fake_model = AutoModelForSequenceClassification.from_pretrained(fake_model_path, num_labels=2).to(device)
     test_trainer = Trainer(fake_model)
     test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False)
@@ -179,7 +179,7 @@ def fake_annotate(ids,test_dataset):
 
 def dem_annotate(ids,test_dataset):
     global return_list
-    dem_model_path = "/project/lerman_316/ashwin/new_models/concerns_democracy/checkpoint-400/"
+    dem_model_path = "new_models/concerns_democracy/checkpoint-400/"
     dem_model = AutoModelForSequenceClassification.from_pretrained(dem_model_path, num_labels=2).to(device)
     test_trainer = Trainer(dem_model)
     test_loader = DataLoader(test_dataset, batch_size=1024, shuffle=False)
@@ -191,7 +191,7 @@ def dem_annotate(ids,test_dataset):
     return_list.extend(generate_annotation_object(ids,"Democracy","concern-3.11",raw_confidence))
 
 
-df=pd.read_csv('/project/lerman_316/ashwin/AllCombinedTwitterData+text_cleaned.csv')
+df=pd.read_csv('AllCombinedTwitterData+text_cleaned.csv')
 print('file read')
 df=df[['id','cleaned_text']]
 df=df.dropna()
@@ -204,5 +204,5 @@ test_dataset = Dataset(x_test_tokenized)
 
 for f in func_dict:
     f(ids,test_dataset)
-with open('/project/lerman_316/ashwin/icwsm_eval.pkl','wb') as fi:
+with open('icwsm_eval.pkl','wb') as fi:
     pickle.dump(return_list,fi)
