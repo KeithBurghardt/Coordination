@@ -6,7 +6,7 @@ Experiments on the 2017 French Election are listed under `experiments`, where we
 
 ## Leveraging Label Correlations in a Multi-label Setting: A Case Study in Emotion
 
-This repo contains code for `Demux` and `MEmo`, emotion recognition models using two different types of language prompts. We study how we can leverage relationships between emotions. We do so at two levels, using word associations and with additional losses.
+This repo contains code for `Demux`. We study how we can leverage relationships between emotions. We do so at two levels, using word associations and with additional losses.
 
 ### `Demux`
 ---
@@ -25,13 +25,7 @@ The contextual embeddings of the emotion words are eseentially label embeddings,
 
 We can consider the emotions classes as *selecting* the features that the Transformer is going to output from the output.
 
-### `MEmo`
 
----
-
-`MEmo` uses a declarative prompt about the emotional content of the input text, but the actual emotions have been replaced by a `[MASK]` token. We either build a classifier on top of the contextual embeddings of the `[MASK]` token, or use the pretrained MLM head and grab the logits of the emotion tokens.
-
-![](./media/memo.png)
 
 ### Regularization
 
@@ -41,7 +35,7 @@ We can consider the emotions classes as *selecting* the features that the Transf
 
 We induce label-correlation awareness by pulling together or pushing apart representations of pairs of emotions. This can be achieved at the level of intermediate representations $h$, and at the level of predictions $\hat{y}$. Prediction pairs can be regularized using the labels $y$, by pulling emotions with the same gold labels together, otherwise pushing them apart. Representation pairs can be regularized in the same way, but we can also use prior relationships between them, which can conflict current labels. Each pair's regularization term can be modulated by the strength of the relationship of the pair.
 
-### Extra Results from Demux and MEmo
+### Extra Results from Demux 
 
 Individual F1 scores for each emotion in each language in the test sets for SemEval 2018 Task 1 E-c, for the Demux setting "intra ρ e^y":
 
@@ -59,8 +53,6 @@ Individual F1 scores for each emotion in each language in the test sets for SemE
 | surprise     | 23.3 &pm; 1.3 | 29.8 &pm; 1.2 | 0.0 &pm; 0.0  |
 | trust        | 11.5 &pm; 1.0 | 31.3 &pm; 1.6 | 27.2 &pm; 3.8 |
 
-The same patterns are observed for MEmo as well. The support for each emotion can be seen in the original dataset paper.
-
 We also present our results for GoEmotions (3 runs on test set), derived from Reddit and with 27 emotions (so more granular choice of emotions, resulting in only a very small subset of it having more than 1 emotion -- in particular 13%, causing our intra-class regularization to very rarely push predictions upwards). Note that we use the make surface-level changes to the preprocessor used for tweets to preprocess the text from Reddit:
 
 | Model             | Macro F1      | Micro F1      |
@@ -68,7 +60,6 @@ We also present our results for GoEmotions (3 runs on test set), derived from Re
 | Demux             | 49.2 &pm; 0.5 | 54.1 &pm; 0.1 |
 | Demux intra 1 e^y | 52.3 &pm; 0.6 | 58.1 &pm; 0.6 |
 | Demux intra ρ e^y | 52.1 &pm; 0.6 | 58.2 &pm; 0.6 |
-| MEmo intra 1 e^y  | 44.0 &pm; 0.9 | 56.3 &pm; 0.1 |
 
 We see a large increase in performance from the inclusion of the local regularization terms.
 
@@ -107,7 +98,7 @@ Our trainers are general-purpose enough to allow use with different datasets, ta
 
 * Trainer:  the trainer also assumes emotion datasets, so it uses `dataset.emotions` (as discussed above), etc. However, in terms of the actual training, it should be extensible to other tasks. The main trainer, `emorec.emorec_utils.trainer.SemEval2018Task1EcTrainer`, includes all regularization losses, and other utilities presented in the papers. For base methods, look at `emorec.trainer.BaseTrainer`.
 
-* Model: any nn.Module. The trainer contains utilities to grab specific outputs of the model. `Demux` and `MEmo` have two outputs by default, the logits and intermediate representations (`None`s when no intermediate representations exist). Look at our models in `emorec/models/` to see how to implement `from_pretrained` so you can load any pretrained LM into your frameworks.
+* Model: any nn.Module. The trainer contains utilities to grab specific outputs of the model. `Demux` has two outputs by default, the logits and intermediate representations (`None`s when no intermediate representations exist). Look at our models in `emorec/models/` to see how to implement `from_pretrained` so you can load any pretrained LM into your frameworks.
 
 * Command-line arguments in the scripts: All the arguments one wants to access when configuring each run should be placed inside the class variable `argparse_args` of the appropriate class in the format that can be seen for example in `emorec.trainer.BaseTrainer`. Moreover, they probably need to be added in `emorec.train_utils.MyTrainingArgument` similarly to the other arguments there. Then, under the experiments folder, each new script should grab these to create an `ArgumentParser` (like we have done).
 
@@ -124,11 +115,11 @@ scripts/correlation-experiments-semeval.sh -c 0 -r 10 -d /path/to/semeval/root #
 
 and `scripts/correlation-experiments-semeval-test.sh` for the test results.
 
-To run the [knowledge transfer experiments](#using-emotion-embeddings-to-transfer-knowledge-between-emotions-languages-and-annotation-formats), follow the same recipe for the rest of the of the bash scripts in `./scripts`, except for `french-elections.sh`, which requires the french election data (and the extra arguments `-f /path/to/french/data` and `-e /path/to/experiment/logs`). We nonetheless provide the scripts and the necessary classes to aid researcher who want to repurpose the model for their needs: `emorec.emorec_utils.dataset.FrenchElectionEmotionClusterDataset`, `emorec.emorec_utils.trainer.FrenchElectionTrainer`, and similarly for `emorec.models.demux` and `emorec.models.memo`.
+To run the [knowledge transfer experiments](#using-emotion-embeddings-to-transfer-knowledge-between-emotions-languages-and-annotation-formats), follow the same recipe for the rest of the of the bash scripts in `./scripts`, except for `french-elections.sh`, which requires the french election data (and the extra arguments `-f /path/to/french/data` and `-e /path/to/experiment/logs`). We nonetheless provide the scripts and the necessary classes to aid researcher who want to repurpose the model for their needs: `emorec.emorec_utils.dataset.FrenchElectionEmotionClusterDataset`, `emorec.emorec_utils.trainer.FrenchElectionTrainer`, and similarly for `emorec.models.demux`.
 
 The project's structure follows the `transformers` library. Things to keep in mind when extending the scripts:
 
-We have implemented our own logging system to keep an orderly track of experiments, which we hope to extend in the future to its own module. It can be found in `emorec.logging_utils`. What you probably need to know is that it produces the folder `experiment_logs`, followed by a specific folder for the model+dataset (so different subfolder for `Demux` v. `MEmo`, different subfolder for `SemEval` v. `GoEmotions`). In that subfolder, different experiment subfolders per configuration are created. The name of each specific experiment subfolder contains some important information like which models were used, which splits, etc. The final integer is used to differentiate runs with different hyperparameters if they do not appear in the main name (the same experiment ran twice will log additional experiments in the same subfolder). AN example can be seen below:
+We have implemented our own logging system to keep an orderly track of experiments, which we hope to extend in the future to its own module. It can be found in `emorec.logging_utils`. What you probably need to know is that it produces the folder `experiment_logs`, followed by a specific folder for the model+dataset (so different subfolder for `SemEval` v. `GoEmotions`). In that subfolder, different experiment subfolders per configuration are created. The name of each specific experiment subfolder contains some important information like which models were used, which splits, etc. The final integer is used to differentiate runs with different hyperparameters if they do not appear in the main name (the same experiment ran twice will log additional experiments in the same subfolder). AN example can be seen below:
 
 ```
 experiment_logs/
