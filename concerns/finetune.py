@@ -64,8 +64,8 @@ categories = ['concerns_democracy',
  'concerns_religion',
  'concerns_terrorism/counterterrorism']
 for label in categories:
-    data = pd.read_csv("/data/ashreyas/eval_train_df.csv")
-    tdata = pd.read_csv("/data/ashreyas/eval_test_df.csv")
+    data = pd.read_csv("/data/eval_train_df.csv")
+    tdata = pd.read_csv("/data/eval_test_df.csv")
     tdata=tdata.dropna()
     data=data.dropna()
     model_name = "./bertweetfr-base"
@@ -92,12 +92,12 @@ for label in categories:
 
     name=label.replace(' ','_')
     name=label.replace('/','_')
-    if not os.path.exists('/data/ashreyas/Incas/'+name+'/'):
-        os.makedirs('/data/ashreyas/Incas/'+name+'/')
+    if not os.path.exists('/data/'+name+'/'):
+        os.makedirs('/data/'+name+'/')
 
     # Define Trainer
     args = TrainingArguments(
-        output_dir='/data/ashreyas/Incas/'+name+'/',
+        output_dir='/data/'+name+'/',
         evaluation_strategy="steps",
         save_steps=50,
         eval_steps=50,
@@ -123,4 +123,4 @@ for label in categories:
 
     res=pd.DataFrame(columns=['prediction'])
     res['prediction']=y_pred_proba
-    res.to_csv('/data/ashreyas/Incas/'+name+'.csv',index=False)
+    res.to_csv('/data/'+name+'.csv',index=False)
