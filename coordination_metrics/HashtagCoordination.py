@@ -1,4 +1,18 @@
 
+import pandas as pd
+import numpy as np
+import pickle as pk
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+ace_dir = 'new_ace/'
+directory = ''
+# prolific
+#twitter_data = pd.read_csv(directory+'AllCombinedTwitterData+text_new.csv')
+twitter_data = pd.read_csv(ace_dir+'twitter_data_updated.csv')
+user_twitter_data = twitter_data.groupby('twitterAuthorScreenname')
+unique_users = np.unique(twitter_data['twitterAuthorScreenname'].values)
+
 twitter_text = twitter_data['contentText'].values.astype(str)
 twitter_data['hashtag_seq'] = ['__'.join([tag.strip("#") for tag in tweet.split() if tag.startswith("#")]) for tweet in twitter_text]
 unique_hash_seq = twitter_data['hashtag_seq'].drop_duplicates()
