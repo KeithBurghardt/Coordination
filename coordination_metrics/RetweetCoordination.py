@@ -60,3 +60,26 @@ for ii,[user,vect] in enumerate(zip(unique_users,X)):
 pk.dump(user_coord,open('user_coord_retweets.pkl','wb'))
 pk.dump(user_sim,open('user_sim_retweets.pkl','wb'))
 pk.dump(num_not_compared,open('num_not_compared_retweets.pkl','wb'))
+
+
+all_weights = []
+min_rt = 10
+user_time = {user:time for user,time in zip(unique_users,num_times)}
+for user,time in zip(unique_users,num_times):
+    if user in user_coord.keys() and time > min_rt:
+        all_weights+=[s for u,s in zip(user_coord[user],user_sim[user]) if u != user and user_time[u]>min_rt]
+print(len(all_weights))   
+all_weights = np.array(all_weights)
+total_num = len(all_weights)
+for t in sorted(list(set(list(all_weights)))):
+    if len(all_weights[all_weights>t])/total_num <= 0.005:
+        thresh = t
+        break
+
+
+retweet_edges = []
+for user,time in zip(unique_users,num_times):
+    if user in user_coord.keys():
+        retweet_edges+=[(user,u) for u,s in zip(user_coord[user],user_sim[user]) if s>thresh and u != user]
+
+    
