@@ -1,3 +1,8 @@
+# Who to vote for
+## What this code does
+This code extracts whether the tweet advocates for someone to vote for a candidate or against a candidate (or both).
+
+## How to run
 
 To run the model, just run "python run.py" on Python3.10
 
