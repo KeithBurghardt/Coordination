@@ -35,24 +35,28 @@ for jj,coord_user in enumerate(unique_users):
     rt_doc.append(coord_binned_times)
     num_times.append(len(coord))
 
+num_times = np.array(num_times)
+k=10
+user_coord = {}
+user_sim = {}
+num_not_compared = 0
+for ii,[user,vect] in enumerate(zip(unique_users,X)):
+    if ii % 1000 == 0:
+        print(round(ii/len(unique_users)*100,2))
+    if num_times[ii] <= k: continue
+    preds = cosine_similarity(X[ii],X)
+    user_coord[user] = unique_users[(num_times>k) & (np.array(preds)[0]>0.9)]
+    user_sim[user] = np.array(preds)[0][(num_times>k) & (np.array(preds)[0]>0.9)]
+    num_not_compared += len(preds) - len(user_sim[user])
+    
 rt_doc_text = [' '.join(rts.astype(str)) for rts in rt_doc]
 vectorizer = TfidfVectorizer()
 X = vectorizer.fit_transform(rt_doc_text)
 
-num_times = np.load('num_times_time.npy',allow_pickle=True)
-unique_users = np.load('unique_users.npy',allow_pickle=True)
-X = np.load('TF-IDF_time.npy',allow_pickle=True)
-
-user_coord= pk.load(open('user_coord_times.pkl','rb'))
-user_sim = pk.load(open('user_sim_times.pkl','rb'))
-num_not_compared = pk.load(open('num_not_compared_times.pkl','rb'))
-
-
-
-retweet_edges = []
+time_edges = []
 for user,time in zip(unique_users,num_times):
     if time > 5:
         if user in user_sim.keys():
-             retweet_edges+=[(user,u) for u,s in zip(user_coord[user],user_sim[user]) if s>0.99 and u != user]
+             time_edges+=[(user,u) for u,s in zip(user_coord[user],user_sim[user]) if s>0.99 and u != user]
 
     
