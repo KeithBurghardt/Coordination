@@ -19,7 +19,7 @@ from tqdm import tqdm
 
 
 baseline=''
-filespath='/data/Coronavirus-Tweets/DARPA_INCAS/Wiki-Scrape/Robust_Scrape'
+filespath='Wiki-Scrape/Robust_Scrape'
 folders=os.listdir(filespath)
 for folder in folders:
     files=os.listdir(os.path.join(filespath,folder))
