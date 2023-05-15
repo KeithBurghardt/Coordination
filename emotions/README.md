@@ -1,5 +1,8 @@
 # Emotion Recognition using Emotion Embeddings, MLM, and emotion correlations
 
+## French elections
+
+Experiments on the 2017 French Election are listed under ![](./experiments), where we use the "FrenchElections" dataset for fine-tuning.
 
 ## Leveraging Label Correlations in a Multi-label Setting: A Case Study in Emotion
 
