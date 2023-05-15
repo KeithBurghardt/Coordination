@@ -17,7 +17,7 @@ class PStanceCOVID2FrenchElection(Dataset):
                 df_fe_val = df_fe_train.sample(frac=0.15, random_state=random_seed)
                 df_fe_train = df_fe_train.drop(df_fe_val.index)
             else:
-                eval_inds = pickle.load(open('../incas/eval_inds2.pkl', 'rb'))
+                eval_inds = pickle.load(open('../eval_inds2.pkl', 'rb'))
                 df_fe_test = df_fe.iloc[eval_inds]
                 df_fe_train = df_fe.drop(eval_inds)
                 df_fe_val = df_fe_train.sample(frac=0.15, random_state=random_seed)
@@ -46,7 +46,7 @@ class PStanceCOVID2FrenchElection(Dataset):
                     df = pd.concat((df_pstance, df_covid, df_fe_val))
 
         else:
-            df_fe = pd.read_csv(f'../incas/10k_annotations.csv')
+            df_fe = pd.read_csv(f'../10k_annotations.csv')
             df_fe_train = df_fe.sample(frac=0.8, random_state=random_seed)
             df_fe_val = df_fe.drop(df_fe_train.index)
 
@@ -100,7 +100,7 @@ class PStanceCOVID2FrenchElection(Dataset):
         if wiki_model:
             wiki_dict_pstance = pickle.load(open(f'../stance-detection/PStance/wiki_dict.pkl', 'rb'))
             wiki_dict_covid = pickle.load(open(f'../stance-detection/covid19-twitter/wiki_dict.pkl', 'rb'))
-            wiki_dict_fe = pickle.load(open(f'../incas/wiki_dict.pkl', 'rb'))
+            wiki_dict_fe = pickle.load(open(f'../wiki_dict.pkl', 'rb'))
 
             wiki_dict = {}
             for wiki_dict_each in [wiki_dict_pstance, wiki_dict_covid, wiki_dict_fe]:
