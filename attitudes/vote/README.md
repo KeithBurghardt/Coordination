@@ -7,3 +7,4 @@ Prerequisite libraries:
 - numpy==1.24.3
 
 
+The full pipeline can be run with run.py
