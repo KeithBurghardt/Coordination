@@ -62,6 +62,7 @@ pk.dump(user_sim,open('user_sim_retweets.pkl','wb'))
 pk.dump(num_not_compared,open('num_not_compared_retweets.pkl','wb'))
 
 
+# find the top 0.5% of similar users
 all_weights = []
 min_rt = 10
 user_time = {user:time for user,time in zip(unique_users,num_times)}
