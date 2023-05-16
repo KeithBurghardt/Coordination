@@ -11,7 +11,7 @@ This repo contains code for `Demux`. We study how we can leverage relationships 
 ### `Demux`
 ---
 
-Heavily inspired from [SpanEmo](https://github.com/gchochla/SpanEmo), `Demux` includes the names of the categories (here, emotions) in the input as its first input sequence, and the actual input as the second sequence. The contextual embeddings for each emotion are used to get a probability for each.
+Heavily inspired from [SpanEmo](https://github.com/gchochla/SpanEmo), `Demux` includes the names of the categories (here, emotions) in the input as its first input sequence, and the actual input as the second sequence. The contextual embeddings for each emotion are used to get a confidence for each.
 
 The contextual embeddings of the emotion words are eseentially label embeddings, so we leverage that to perform operations on them and transfer knowledge to different annotation formats.
 
