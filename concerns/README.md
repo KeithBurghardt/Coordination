@@ -2,4 +2,4 @@
 # Concerns model
 
 ## How to run
-To find concern-related text for training, we first use the code SAGE-Wiki.py to extract major keywords associated with each concern.
+We fine-tune a BERTweetFR embedding model to extract concerns in 10K human annotations (fine-tune.py). We then apply this model to the full 5M dataset (new_predict.py).
