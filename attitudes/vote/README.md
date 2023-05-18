@@ -21,7 +21,7 @@ The full pipeline can be run with run.py
 
 - datasets.py: extract data for training
 - engine.py: all the training/testing is done here
-- models.py: collects models
+- models.py: all models are defined here
 - train.py: train model
 - test.py: apply trained model for testing
 - run.py: run full pipeline (training/testing parameters are chosen here)
