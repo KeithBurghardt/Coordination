@@ -48,9 +48,6 @@ def load_data(data_path,test_path,seed =1):
     """
     # loading training and dev dataset
     df_train = pd.read_csv(data_path,lineterminator='\n')
-    # df_train = df.sample(frac=0.9,random_state=seed)
-    # df_test = df.drop(df_train.index)
-    # df_train = pd.read_csv(train_data_path,lineterminator='\n')
     df_test = pd.read_csv(test_path,lineterminator='\n')
     df_val = df_train.sample(frac=0.1,random_state=seed)
     df_train = df_train.drop(df_val.index)
@@ -245,8 +242,6 @@ if __name__ == '__main__':
 
                 report = classification_report(test_labels, test_preds, digits=3)
                 print(report)
-                # res['auc_ovr'].append(roc_auc_score(test_labels.tolist(), test_preds.tolist(), average='weighted', multi_class='ovr'))
-                # res['auc_ovo'].append(roc_auc_score(test_labels.tolist(), test_preds.tolist(),average='weighted',multi_class='ovo'))
                 res['auc'].append(roc_auc_score_multiclass(test_labels.tolist(), test_preds.tolist()))
                 res['f1'].append(f1_score(test_labels, test_preds, average=None).tolist())
 
