@@ -25,7 +25,7 @@ Applies AutoModelForSequenceClassification with a XLM-Roberta model (multi-lingu
 - Passes the output vector of the [CLS] token (the first token for BERT-like models) through a linear layer to obtain the logits (unnormalized scores) for each possible class.
 - Optionally applies a softmax function to the logits to convert them into probabilities.
 
-## Execute data cleaning and model training pipeline
+## Execute model training pipeline
 
 run.sh does the follwing:
 - Activate Conda instance
