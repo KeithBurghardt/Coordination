@@ -15,5 +15,15 @@ Prerequisite libraries:
 - pandas==2.0.1
 - numpy==1.24.3
 
-
 The full pipeline can be run with run.py
+
+## Files
+
+- datasets.py: extract data for training
+- engine.py: 
+- models.py: collects models
+- train.py: prepare dataset for training
+- test.py: apply trained model for testing
+- run.py: run full pipeline
+
+
