@@ -28,3 +28,5 @@ Applies AutoModelForSequenceClassification with a XLM-Roberta model (multi-lingu
 ## Execute data cleaning and model training pipeline
 
 run.sh does the follwing:
+- Activate Conda instance
+- Runs python finetune_transformer.py with "cardiffnlp/twitter-xlm-roberta-base" and several training parameters
