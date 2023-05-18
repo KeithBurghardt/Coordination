@@ -5,14 +5,14 @@
 
 preprocessing.py does the following for each tweet:
 
-    - remove URLs
-    - replace all mentions with "@user"
-    - remove or split hashtags
-    - emojis to description
-    - to lower case
-    - remove punctuations
-    - remove non-ascii
-    - remove emoticons
+- remove URLs
+- replace all mentions with "@user"
+- remove or split hashtags
+- emojis to description
+- to lower case
+- remove punctuations
+- remove non-ascii
+- remove emoticons
 
 ## Model training and fine-tuning
 finetune_transformer.py does the following:
