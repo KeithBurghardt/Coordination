@@ -21,7 +21,6 @@ from preprocessing import preprocess_tweet
 # EPOCHS = 5
 # BATCH_SIZE = 32
 MODEL = "cardiffnlp/twitter-xlm-roberta-base"
-# MODEL = "camembert-base"
 
 ## Data
 class MyDataset(torch.utils.data.Dataset):
