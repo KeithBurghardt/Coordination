@@ -20,10 +20,10 @@ The full pipeline can be run with run.py
 ## Files
 
 - datasets.py: extract data for training
-- engine.py: 
+- engine.py: all the training/testing is done here
 - models.py: collects models
-- train.py: prepare dataset for training
+- train.py: train model
 - test.py: apply trained model for testing
-- run.py: run full pipeline
+- run.py: run full pipeline (training/testing parameters are chosen here)
 
 
