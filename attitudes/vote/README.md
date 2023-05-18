@@ -2,6 +2,10 @@
 ## What this code does
 This code extracts whether the tweet advocates for someone to vote for a candidate or against a candidate (or both).
 
+- Uses XLM-T model (rather than original BERT model) for <url=https://aclanthology.org/2022.wassa-1.7/>WS-BERT</url>
+- WS-BERT (we can also call this WS-XLM-T) is trained with all topics in 'covid' dataset
+- Model is fine-tuned on 10K human annotations of French tweets
+
 ## How to run
 
 To run the model, just run "python run.py" on Python3.10
