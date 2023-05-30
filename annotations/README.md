@@ -2,7 +2,7 @@
 ## Files:
 - Annotation guidance (PDF)
 
-- 10K annotations: CSV
+- 10K annotations: CSV. Original text is only kept for review purposes, after which it will be removed.
 
 ## Annotations:
 
