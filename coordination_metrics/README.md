@@ -9,9 +9,9 @@ Pacheco, D., Hui, P.-M., Torres-Lugo, C., Truong, B. T., Flammini, A., & Menczer
 
 
 # How to run
-
+```
 python coordination.py <filename>
-
+```
 ## Tweet text coordination
 We consider accounts coordinated if they use share a long list of hashtags in a given tweet that are in the exact same order. This is highly unlikely to occur by chance.
 
