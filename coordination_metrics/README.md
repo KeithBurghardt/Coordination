@@ -11,3 +11,7 @@ We back up these results with a complimentary metric, in which accounts are coor
 
 ## Tweet time coordination
 We finally back up our results with a tweet timing metric, whereby accounts are considered coordinated if they both tweet content at nearly the same times. 
+
+# Coordination.py
+
+This code reads in jsonl files with a standard format and returns edgelists (a list of edges between node pairs) where nodes are connected if they are coordinated. 
