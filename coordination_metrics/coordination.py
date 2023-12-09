@@ -8,7 +8,7 @@
 import pandas as pd
 import networkx as nx
 import numpy as np
-import ast
+import ast,sys
 from datetime import datetime
 
 
@@ -249,8 +249,8 @@ def load_data(file):
         data['tweetId']=tweet_ids
         data['engagementParentId'] = engagementParentIds
     return data
-def main(**args):
-    file = args[0]
+def main(argv):
+    file = argv[0]
     print(file)
     data = load_data(file)
     for mediatype in data['mediaType'].drop_duplicates().values:
@@ -274,4 +274,7 @@ def main(**args):
         nx.write_edgelist(time_coord_accounts,outfile+'_time'+'.edgelist')
         nx.write_edgelist(retweet_coord_accounts,outfile+'_retweet'+'.edgelist')     
 
+if __name__ == "__main__":
+   main(sys.argv[1:])
+            
 
