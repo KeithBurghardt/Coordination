@@ -1,37 +1,31 @@
-#from flask import Flask
-#app = Flask(__name__)
 
-#@app.route('/')
-#def hello_world():
-#    return 'Hello, Docker!'
+import pandas as pd 
+import networkx as nx 
+import numpy as np 
+import ast,sys 
+from datetime import datetime,date, timedelta 
+import re 
+from sklearn.feature_extraction.text import TfidfVectorizer 
+from sklearn.metrics.pairwise import cosine_similarity 
+import calendar
 
-import pandas as pd
-import networkx as nx
-import numpy as np
-import ast,sys
-from datetime import datetime
-
-
-def hashtag_coord(twitter_data,min_hashes=3):
+def hashtag_coord(twitter_data,author_id,min_hashes=3):
     # minimum of 5 hashtags; alternatives based on cosine similarity of tweets could work too
     #min_hashes = 5
-    
     twitter_text = twitter_data['contentText'].values.astype(str)
     twitter_data['hashtag_seq'] = ['__'.join([tag.strip("#").strip('.').strip(',').strip(';').strip('!').strip(':') for tag in tweet.split() if tag.startswith("#")]) for tweet in twitter_text]
     unique_hash_seq = twitter_data['hashtag_seq'].drop_duplicates()
     hashes = twitter_data.groupby('hashtag_seq')
     duplicate_hash_users = {}
-
     for jj,tweet in enumerate(unique_hash_seq):
-        
         if len(tweet.split('__')) < min_hashes: continue
         all_tweets = hashes.get_group(tweet)
         all_tweets_tweet = all_tweets.loc[(all_tweets['engagementType']=='tweet') | (all_tweets['engagementType']=='reply'),]
-        num_users = len(all_tweets_tweet['twitterAuthorScreenname'].drop_duplicates())
+        num_users = len(all_tweets_tweet[author_id].drop_duplicates())
         # if multiple tweets and multiple users 
         if num_users < len(all_tweets_tweet):
             links = all_tweets[['tweetId','engagementParentId']].drop_duplicates()
-            users = all_tweets['twitterAuthorScreenname'].drop_duplicates().tolist()
+            users = all_tweets[author_id].drop_duplicates().tolist()
             duplicate_hash_users[tweet] = users
     all_dup_hash_users = []
     coord_hash_users = []
@@ -50,7 +44,7 @@ def hashtag_coord(twitter_data,min_hashes=3):
     G.add_edges_from(edges)
     return G
 
-def retweet_coord(twitter_data,most_similar_cutoff= 0.995):
+def retweet_coord(twitter_data,author_id,most_similar_cutoff= 0.995):
     #most_similar_cutoff = 0.995
     # minimum number of retweets
     min_retweets=10
@@ -58,12 +52,11 @@ def retweet_coord(twitter_data,most_similar_cutoff= 0.995):
     pred = []
     rt_doc = []
     num_times = []
-    unique_users = twitter_data['twitterAuthorScreenname'].drop_duplicates().values
-    user_twitter_data = twitter_data.groupby('twitterAuthorScreenname')
-    twitter_data = pd.concat([user_twitter_data.get_group(u).loc[user_twitter_data.get_group(u)['engagementType']=='retweet',] for u in unique_users if 
-len(user_twitter_data.get_group(u).loc[user_twitter_data.get_group(u)['engagementType']=='retweet',])>=min_retweets])
-    unique_users = twitter_data['twitterAuthorScreenname'].drop_duplicates().values
-    user_twitter_data = twitter_data.groupby('twitterAuthorScreenname')
+    unique_users = twitter_data[author_id].drop_duplicates().values
+    user_twitter_data = twitter_data.groupby(author_id)
+    twitter_data = pd.concat([user_twitter_data.get_group(u).loc[user_twitter_data.get_group(u)['engagementType']=='retweet',] for u in unique_users if len(user_twitter_data.get_group(u).loc[user_twitter_data.get_group(u)['engagementType']=='retweet',])>=min_retweets])
+    unique_users = twitter_data[author_id].dropna().drop_duplicates().values
+    user_twitter_data = twitter_data.groupby(author_id)
     # record all retweet IDs
     for jj,coord_user in enumerate(unique_users):
         if jj % 10000 == 0:
@@ -127,30 +120,31 @@ len(user_twitter_data.get_group(u).loc[user_twitter_data.get_group(u)['engagemen
 
 
 # bin tweets between min year and max year in 30 minute intervals
-def time_coord(twitter_data,min_month,min_year,max_month,max_year,most_similar_cutoff=0.995):
+def time_coord(twitter_data,author_id,min_month,min_year,max_month,max_year,most_similar_cutoff=0.995):
     min_tweets=10
     #most_similar_cutoff = 0.995
     bin_size = 30 # 30 minute intervals
-    num_bins = int((datetime(max_year,max_month,1)-datetime(min_year,min_month,1)).days*24*60/bin_size)
+    first_day,last_day = calendar.monthrange(max_year,max_month)
+    num_bins = int((datetime(max_year,max_month,last_day)-datetime(min_year,min_month,1)).days*24*60/bin_size)
     # bins of 30 minute intervals from min_year to max_year
-    all_bins = [datetime(min_year,1,1)+timedelta(minutes=bin_size*i) for i in range(num_bins)]
-    all_bins = pd.to_datetime(all_bins)
+    all_bins = [datetime(min_year,min_month,1)+timedelta(minutes=bin_size*i) for i in range(num_bins)]
+    all_bins = pd.to_datetime(all_bins,utc=True)
     time_doc = []
     num_times = []
-    unique_users = twitter_data['twitterAuthorScreenname'].drop_duplicates().values
-    user_twitter_data = twitter_data.groupby('twitterAuthorScreenname')
+    unique_users = twitter_data[author_id].dropna().drop_duplicates().values
+    user_twitter_data = twitter_data.groupby(author_id)
     twitter_data = pd.concat([user_twitter_data.get_group(u) for u in unique_users if len(user_twitter_data.get_group(u))>=min_tweets])
-    unique_users = twitter_data['twitterAuthorScreenname'].drop_duplicates().values
+    unique_users = twitter_data[author_id].drop_duplicates().values
     # saving time tweets are made as strings
     # we record whether tweets are made in 30 minute intervals
     for jj,coord_user in enumerate(unique_users):
         if jj % 50000 == 0:
             print(round(jj/len(unique_users)*100,2))        
         coord = user_twitter_data.get_group(coord_user)
-        coord_tweet_time = pd.to_datetime(coord['time_dt'])
+        coord_tweet_time = pd.to_datetime(coord['timePublished'],utc=True,unit='s')
         # all times where there is 1+ tweets
         hist = np.histogram(coord_tweet_time,all_bins)
-        coord_binned_times = hist[1][:-1][hist[0]>0]        
+        coord_binned_times = hist[1][:-1][hist[0]>0]
         time_doc.append(coord_binned_times)
         num_times.append(len(coord))
 
@@ -220,26 +214,25 @@ def load_data(file):
         tweet_ids = []
         engagementParentIds = []
         for line in data['mediaTypeAttributes'].values:
-            line = ast.literal_eval(line)
-
+            if type(line) == str:
+                line = ast.literal_eval(line)
+            author=np.nan
+            engagement_type=np.nan
+            tweet_id = np.nan
+            engagementParentId = np.nan
             try:
                 if 'twitterData' in line.keys():
                     if 'twitterAuthorScreenname' in line['twitterData'].keys():
                         author = line['twitterData']['twitterAuthorScreenname']
                     if 'engagementType' in line['twitterData'].keys():
-                        engagement_type = line['engagementType']
+                        engagement_type = line['twitterData']['engagementType']
                     if 'tweetId' in line['twitterData'].keys():
                         tweet_id = line['twitterData']['tweetId']
                     if 'engagementParentId' in line['twitterData'].keys():
                         if str(line['twitterData']['engagementParentId']) != 'null':
                             engagementParentId = line['twitterData']['engagementParentId']
-
             except:
-                author=np.nan
-                engagement_type=np.nan
-                tweet_id = np.nan
-                engagementParentId = np.nan
-
+                pass
             authors.append(author)
             engagement_types.append(engagement_type)
             engagementParentIds.append(engagementParentId)
@@ -249,32 +242,50 @@ def load_data(file):
         data['tweetId']=tweet_ids
         data['engagementParentId'] = engagementParentIds
     return data
+
 def main(argv):
     file = argv[0]
     print(file)
     data = load_data(file)
+    data = data.sample(frac=0.05)
+    min_hash = 3
     for mediatype in data['mediaType'].drop_duplicates().values:
+        print(mediatype)
+        if mediatype.lower() == 'facebook' or mediatype.lower() == 'reddit': continue
         outfile = file.replace('.jsonl','')+'_'+mediatype
         data_mt = data.loc[data['mediaType']==mediatype,]
+        print(len(data_mt))
+        author_id = 'twitterAuthorScreenname'
+        num_authors = len(data_mt.loc[data_mt[author_id]!=None,author_id].dropna().drop_duplicates())
+        if num_authors == 0:
+            author_id = 'author'
+        num_authors = len(data_mt.loc[data_mt[author_id]!=None,author_id].dropna().drop_duplicates())
+        if num_authors == 0:
+            author_id = 'name'
+        print(num_authors)
         min_time = data_mt['timePublished'].values.min()
-        datetime_obj=datetime.fromtimestamp(min_time)
+        if min_time > 1000000000000: # if milliseconds
+            data_mt['timePublished'] = data_mt['timePublished'].values/1000 # convert to seconds
+        min_time = data_mt['timePublished'].values.min()
+        datetime_obj=datetime.utcfromtimestamp(min_time)
         min_month = datetime_obj.month
         min_year = datetime_obj.year
         max_time = data_mt['timePublished'].values.max()
-        datetime_obj=datetime.fromtimestamp(max_time)
+        datetime_obj=datetime.utcfromtimestamp(max_time)
         max_month = datetime_obj.month
         max_year = datetime_obj.year
-        
-        thresh,time_coord_accounts = time_coord(data_mt,min_month,min_year,max_month,max_year)
+        print(data_mt['timePublished'])
+        #hashtag_accounts = hashtag_coord(data_mt,author_id,min_hash)
+        #nx.write_edgelist(hashtag_accounts,outfile+'_hashtag_min_hash='+str(min_hash)+'.edgelist')
         thresh,retweet_coord_accounts = [None,nx.Graph()]
-        hashtag_accounts = hashtag_coord(data_mt)
         if mediatype == 'Twitter':
-            thresh,retweet_coord_accounts = retweet_coord(data_mt)
-        nx.write_edgelist(hashtag_accounts,outfile+'_hashtag'+'.edgelist')
-        nx.write_edgelist(time_coord_accounts,outfile+'_time'+'.edgelist')
+            thresh,retweet_coord_accounts = retweet_coord(data_mt,author_id)
         nx.write_edgelist(retweet_coord_accounts,outfile+'_retweet'+'.edgelist')     
+
+        thresh,time_coord_accounts = time_coord(data_mt,author_id,min_month,min_year,max_month,max_year)
+        nx.write_edgelist(time_coord_accounts,outfile+'_time'+'.edgelist')
+
 
 if __name__ == "__main__":
    main(sys.argv[1:])
-            
 
