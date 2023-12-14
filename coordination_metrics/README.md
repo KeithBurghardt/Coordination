@@ -3,10 +3,11 @@
 This code reads in jsonl files with a standard format and returns edgelists (a list of edges between node/account pairs) where nodes/accounts are connected if they are coordinated. 
 
 # Coordination metrics
-We use the following coordination metrics based on Pacheco et al., (2021).
+We use the following coordination metrics based on Pacheco et al., (2021) and Burghardt et al., (2024).
 
 Pacheco, D., Hui, P.-M., Torres-Lugo, C., Truong, B. T., Flammini, A., & Menczer, F. (2021). Uncovering Coordinated Networks on Social Media: Methods and Case Studies. Proceedings of the International AAAI Conference on Web and Social Media, 15(1), 455-466.
 
+ Burghardt, K., Rao, A., Guo, S., He, Z., Chochlakis, G., Sabyasachee, B., Rojecki, A., Narayanan, S., Lerman, K. (2024) Socio-Linguistic Characteristics of Coordinated Inauthentic Accounts. In: Proceedings of the Seventeenth International AAAI Conference on Web and Social Media (in press).
 
 # How to run
 ```
