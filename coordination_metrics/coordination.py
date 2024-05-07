@@ -10,28 +10,38 @@ from sklearn.metrics.pairwise import cosine_similarity
 import calendar
 
 def hashtag_coord(twitter_data,author_id,min_hashes=3):
-    # minimum of 5 hashtags; alternatives based on cosine similarity of tweets could work too
-    #min_hashes = 5
-    twitter_text = twitter_data['contentText'].values.astype(str)
-    twitter_data['hashtag_seq'] = ['__'.join([tag.strip("#").strip('.').strip(',').strip(';').strip('!').strip(':') for tag in tweet.split() if tag.startswith("#")]) for tweet in twitter_text]
-    unique_hash_seq = twitter_data['hashtag_seq'].drop_duplicates()
-    hashes = twitter_data.groupby('hashtag_seq')
+    # default minimum of 3 hashtags; alternatives based on cosine similarity of tweets could work too
+    # only look at replies or original tweets (not retweets or quotes)
+    twitter_data2 = twitter_data.loc[(all_tweets['engagementType']=='tweet') | (all_tweets['engagementType']=='reply'),]
+    # look at text
+    twitter_text = twitter_data2['contentText'].values.astype(str)
+    # get hashtag sequence
+    twitter_data2['hashtag_seq'] = ['__'.join([tag.strip("#").strip('.').strip(',').strip(';').strip('!').strip(':') for tag in tweet.split() if tag.startswith("#")]) for tweet in twitter_text]
+    # all unique hashtag sequences
+    unique_hash_seq = twitter_data2['hashtag_seq'].drop_duplicates()
+    # sort tweets by hashtag sequence
+    hashes = twitter_data2.groupby('hashtag_seq')
     duplicate_hash_users = {}
+    # for each unique hashtag sequence
     for jj,tweet in enumerate(unique_hash_seq):
+        # ignore if sequence is too short
         if len(tweet.split('__')) < min_hashes: continue
+        # all tweets with this hash sequence
         all_tweets = hashes.get_group(tweet)
-        all_tweets_tweet = all_tweets.loc[(all_tweets['engagementType']=='tweet') | (all_tweets['engagementType']=='reply'),]
-        num_users = len(all_tweets_tweet[author_id].drop_duplicates())
-        # if multiple tweets and multiple users 
-        if num_users < len(all_tweets_tweet):
-            links = all_tweets[['tweetId','engagementParentId']].drop_duplicates()
+        # all users with this sequence
+        num_users = len(all_tweets[author_id].drop_duplicates())
+        # if multiple users
+        if num_users >1:   
+            # all unique users
             users = all_tweets[author_id].drop_duplicates().tolist()
             duplicate_hash_users[tweet] = users
+            
     all_dup_hash_users = []
-    coord_hash_users = []
+    coord_hash_users = []  
+    # for each hashtag sequence with multiple users
     for key in duplicate_hash_users.keys():
-        if len(duplicate_hash_users[key]) > 1:
-            coord_hash_users.append(duplicate_hash_users[key])
+        # record coord users
+        coord_hash_users.append(duplicate_hash_users[key])
         all_dup_hash_users+=duplicate_hash_users[key]
     # network
     edges = []
@@ -43,6 +53,7 @@ def hashtag_coord(twitter_data,author_id,min_hashes=3):
     G = nx.Graph()
     G.add_edges_from(edges)
     return G
+
 
 def retweet_coord(twitter_data,author_id,most_similar_cutoff= 0.995):
     #most_similar_cutoff = 0.995
