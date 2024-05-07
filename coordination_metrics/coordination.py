@@ -12,7 +12,7 @@ import calendar
 def hashtag_coord(twitter_data,author_id,min_hashes=3):
     # default minimum of 3 hashtags; alternatives based on cosine similarity of tweets could work too
     # only look at replies or original tweets (not retweets or quotes)
-    twitter_data2 = twitter_data.loc[(all_tweets['engagementType']=='tweet') | (all_tweets['engagementType']=='reply'),]
+    twitter_data2 = twitter_data.loc[(twitter_data['engagementType']=='tweet') | (twitter_data['engagementType']=='reply'),]
     # look at text
     twitter_text = twitter_data2['contentText'].values.astype(str)
     # get hashtag sequence
