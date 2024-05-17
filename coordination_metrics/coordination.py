@@ -286,8 +286,8 @@ def main(argv):
         max_month = datetime_obj.month
         max_year = datetime_obj.year
         print(data_mt['timePublished'])
-        #hashtag_accounts = hashtag_coord(data_mt,author_id,min_hash)
-        #nx.write_edgelist(hashtag_accounts,outfile+'_hashtag_min_hash='+str(min_hash)+'.edgelist')
+        hashtag_accounts = hashtag_coord(data_mt,author_id,min_hash)
+        nx.write_edgelist(hashtag_accounts,outfile+'_hashtag_min_hash='+str(min_hash)+'.edgelist')
         thresh,retweet_coord_accounts = [None,nx.Graph()]
         if mediatype == 'Twitter':
             thresh,retweet_coord_accounts = retweet_coord(data_mt,author_id)
